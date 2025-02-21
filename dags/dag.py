@@ -7,7 +7,7 @@ from scripts.captura_dados import captura_quantidade_dados
 from scripts.processamento import mover_para_raw
 from scripts.limpeza_dados import limpar_e_validar_dados
 from scripts.gerar_relatorio import gerar_relatorio
-from scripts.descompactar_zip import baixar_descompactar_zip
+from scripts.descompactar_zip import descompactar_zip_2021
 
 dag = DAG(
     'atracacoes_e_cargas',
@@ -18,7 +18,7 @@ dag = DAG(
 
 baixar_descompactar_task = PythonOperator(
     task_id='baixar_descompactar_arquivo_zip',
-    python_callable=baixar_descompactar_zip,  # Função que será chamada
+    python_callable=descompactar_zip_2021,  # Função que será chamada
     dag=dag
 )
 
@@ -46,5 +46,5 @@ baixar_descompactar_task = PythonOperator(
 #     dag=dag
 # )
 
-baixar_descompactar_zip
+descompactar_zip_2021
 # task_captura_quantidade_dados >> task_processar_txt_para_parquet >> task_limpar_e_validar >> task_gerar_relatorio
