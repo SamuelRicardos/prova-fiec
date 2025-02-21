@@ -25,7 +25,7 @@ def gerar_relatorio():
         'STSH2', 'Tipo Operação da Carga', 'STSH4', 'Carga Geral Acondicionamento', 'Natureza da Carga',
         'ConteinerEstado', 'Sentido', 'Tipo Navegação', 'TEU', 'FlagAutorizacao', 'QTCarga',
         'FlagCabotagem', 'VLPesoCargaBruta', 'FlagCabotagemMovimentacao', 'Ano da data de início da operação da atracação',
-        'FlagConteinerTamanho', 'Mês da data de início da operação da atracação'
+        'FlagConteinerTamanho', 'Mês da data de início da operação da atracação', 'FlagLongoCurso', 'FlagMCOperacaoCarga', 'FlagOffshore'
     ]
     
     for arquivo in os.listdir(trusted_dir):
