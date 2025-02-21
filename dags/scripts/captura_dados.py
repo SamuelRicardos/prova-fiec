@@ -1,22 +1,30 @@
-import pandas as pd
-import requests
-import json
 import os
+import shutil
 
-BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../datalake'))
+# Caminho para a pasta 'data' na raiz do projeto
+BASE_PATH = os.path.abspath(os.path.dirname(__file__))  # Caminho para a raiz do projeto
+DATA_PATH = os.path.join(BASE_PATH, '../../data')  # Caminho para a pasta 'data'
+LANDING_PATH = os.path.join(BASE_PATH, 'datalake', 'landing')  # Caminho para a pasta 'landing' dentro de 'datalake'
 
 def captura_quantidade_dados():
-    url = "https://data.cityofnewyork.us/resource/rc75-m7u3.json"
-    response = requests.get(url)
-    
-    df = pd.DataFrame(json.loads(response.content))
-    
-    landing_path = os.path.join(BASE_PATH, 'landing')
-    os.makedirs(landing_path, exist_ok=True)
-    
-    file_path = os.path.join(landing_path, 'dados_covid_ny.csv')
-    df.to_csv(file_path, index=False)
-    
-    print(f"Dados salvos na camada 'landing': {file_path}")
+    # Verificando se a pasta 'data' existe e contém arquivos .txt
+    arquivos_txt = [f for f in os.listdir(DATA_PATH) if f.endswith('.txt')]
 
-    return len(df.index)
+    if not arquivos_txt:
+        print("Nenhum arquivo .txt encontrado na pasta 'data'.")
+        return 0
+
+    os.makedirs(LANDING_PATH, exist_ok=True)  # Garantir que a pasta landing existe
+
+    for arquivo in arquivos_txt:
+        origem = os.path.join(DATA_PATH, arquivo)
+        destino = os.path.join(LANDING_PATH, arquivo)
+
+        try:
+            # Movendo o arquivo .txt da pasta 'data' para a pasta 'landing'
+            shutil.move(origem, destino)
+            print(f"Arquivo {arquivo} movido para a camada 'landing'.")
+        except Exception as e:
+            print(f"Erro ao mover {arquivo}: {e}")
+
+    return len(arquivos_txt)

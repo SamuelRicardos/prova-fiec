@@ -2,10 +2,6 @@ from datetime import datetime
 from airflow.operators.python import PythonOperator
 from airflow import DAG
 
-import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../scripts')))
-
 from scripts.captura_dados import captura_quantidade_dados
 from scripts.processamento import mover_para_raw
 from scripts.limpeza_dados import limpar_e_validar_dados
