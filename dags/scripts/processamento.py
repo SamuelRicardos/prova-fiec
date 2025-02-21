@@ -2,32 +2,22 @@ import pandas as pd
 import os
 
 BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../datalake'))
-LANDING_PATH = os.path.join(BASE_PATH, 'landing')
-RAW_PATH = os.path.join(BASE_PATH, 'raw')
 
-def processar_txt_para_parquet():
-    arquivos_txt = [f for f in os.listdir(LANDING_PATH) if f.endswith('.txt')]
+def mover_para_raw():
+    landing_path = os.path.join(BASE_PATH, 'landing', 'dados_covid_ny.csv')
+    raw_path = os.path.join(BASE_PATH, 'raw', 'dados_covid_ny.parquet')
 
-    if not arquivos_txt:
-        print("Nenhum arquivo .txt encontrado na camada 'landing'.")
-        return 0
+    os.makedirs(os.path.join(BASE_PATH, 'raw'), exist_ok=True)
 
-    for arquivo in arquivos_txt:
-        origem = os.path.join(LANDING_PATH, arquivo)
-        destino = os.path.join(RAW_PATH, arquivo.replace('.txt', '.parquet'))
-        
-        try:
-            df = pd.read_csv(origem, delimiter=';', encoding='utf-8')  # Ajuste o delimitador conforme necessário
-            df.to_parquet(destino, engine="pyarrow", index=False)
-            
-            os.remove(origem)  # Remove o arquivo original após a conversão
-            
-            print(f"Arquivo convertido e movido para camada 'raw': {destino}")
-        except Exception as e:
-            print(f"Erro ao processar {arquivo}: {e}")
+    if os.path.exists(landing_path):
+        df = pd.read_csv(landing_path)
 
-    return len(arquivos_txt)
+        df['date_of_interest'] = pd.to_datetime(df['date_of_interest'])
 
-# Executar o processamento
-quantidade = processar_txt_para_parquet()
-print(f"Total de arquivos convertidos: {quantidade}")
+        df.to_parquet(raw_path, engine="pyarrow", index=False)
+
+        os.remove(landing_path)
+
+        print(f"Arquivo convertido e movido para camada 'raw': {raw_path}")
+    else:
+        print("Arquivo não encontrado na camada 'landing'")

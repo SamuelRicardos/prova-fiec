@@ -3,58 +3,24 @@ import pandas as pd
 
 # Caminho base para o Data Lake
 BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../datalake'))
-RAW_PATH = os.path.join(BASE_PATH, 'raw')
-TRUSTED_PATH = os.path.join(BASE_PATH, 'trusted')
-
-# Criar a pasta trusted se não existir
-os.makedirs(TRUSTED_PATH, exist_ok=True)
 
 def limpar_e_validar_dados():
-    # Listar todos os arquivos .parquet na camada 'raw'
-    arquivos_parquet = [f for f in os.listdir(RAW_PATH) if f.endswith('.parquet')]
+    raw_path = os.path.join(BASE_PATH, 'raw', 'dados_covid_ny.parquet')
+    trusted_path = os.path.join(BASE_PATH, 'trusted', 'dados_covid_ny.parquet')
 
-    if not arquivos_parquet:
-        print("Nenhum arquivo .parquet encontrado na camada 'raw'.")
-        return 0
+    os.makedirs(os.path.join(BASE_PATH, 'trusted'), exist_ok=True)
 
-    for arquivo in arquivos_parquet:
-        origem = os.path.join(RAW_PATH, arquivo)
-        destino = os.path.join(TRUSTED_PATH, arquivo)
+    if os.path.exists(raw_path):
+        df = pd.read_parquet(raw_path, engine="pyarrow")
 
-        try:
-            # Carregar o arquivo parquet
-            df = pd.read_parquet(origem, engine="pyarrow")
+        colunas_para_manter = ['date_of_interest', 'case_count', 'hospitalized_count']
+        df = df[colunas_para_manter]
 
-            # Checando o nome do arquivo para determinar o tipo (Atracação ou Carga)
-            if 'Atracacao' in arquivo:
-                # Limpeza específica para Atracação
-                df['Data Atracação'] = pd.to_datetime(df['Data Atracação'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
-                df['Data Chegada'] = pd.to_datetime(df['Data Chegada'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
-                df['Data Desatracação'] = pd.to_datetime(df['Data Desatracação'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
+        df['date_of_interest'] = pd.to_datetime(df['date_of_interest'], errors='coerce')
+        
+        df = df.dropna()
 
-                # Remover registros com valores ausentes
-                df = df.dropna(subset=['Data Atracação', 'Data Chegada', 'Data Desatracação'])
-
-            elif 'Carga' in arquivo:
-                # Limpeza específica para Carga
-                df['VLPesoCargaBruta'] = pd.to_numeric(df['VLPesoCargaBruta'], errors='coerce')
-                df['QTVolume'] = pd.to_numeric(df['QTVolume'], errors='coerce')
-
-                # Remover registros com valores ausentes
-                df = df.dropna(subset=['VLPesoCargaBruta', 'QTVolume'])
-
-            # Salvar o dataframe limpo na camada 'trusted'
-            df.to_parquet(destino, engine="pyarrow", index=False)
-            
-            # Remover o arquivo original da camada 'raw' após processamento
-            os.remove(origem)
-            
-            print(f"✅ Dados limpos e salvos na camada 'trusted': {destino}")
-        except Exception as e:
-            print(f"Erro ao processar {arquivo}: {e}")
-
-    return len(arquivos_parquet)
-
-# Executar a limpeza e validação
-quantidade = limpar_e_validar_dados()
-print(f"Total de arquivos limpos e movidos para 'trusted': {quantidade}")
+        df.to_parquet(trusted_path, engine="pyarrow", index=False)
+        print(f"✅ Dados limpos e salvos na camada 'trusted': {trusted_path}")
+    else:
+        print("⚠️ Arquivo não encontrado na camada 'raw'")

@@ -7,7 +7,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../scripts')))
 
 from scripts.captura_dados import captura_quantidade_dados
-from scripts.processamento import processar_txt_para_parquet
+from scripts.processamento import mover_para_raw
 from scripts.limpeza_dados import limpar_e_validar_dados
 from scripts.gerar_relatorio import gerar_relatorio
 
@@ -21,13 +21,12 @@ dag = DAG(
 task_captura_quantidade_dados = PythonOperator(
     task_id='captura_quantidade_dados',
     python_callable=captura_quantidade_dados,
-    provide_context=True,
     dag=dag
 )
 
 task_processar_txt_para_parquet = PythonOperator(
     task_id='processar_txt_para_parquet',
-    python_callable=processar_txt_para_parquet,
+    python_callable=mover_para_raw,
     dag=dag
 )
 
