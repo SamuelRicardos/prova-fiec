@@ -2,14 +2,14 @@ import os
 import shutil
 
 BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../datalake'))
-DATA_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../data'))
+DATA_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../data'))
 LANDING_PATH = os.path.join(BASE_PATH, 'landing')
 
 # Criar a pasta landing se não existir
 os.makedirs(LANDING_PATH, exist_ok=True)
 
 def captura_quantidade_dados():
-    arquivos_txt = [dados for dados in os.listdir(DATA_PATH) if dados.endswith('.txt')]
+    arquivos_txt = [f for f in os.listdir(DATA_PATH) if f.endswith('.txt')]
     
     if not arquivos_txt:
         print("Nenhum arquivo .txt encontrado na pasta data.")

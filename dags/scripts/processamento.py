@@ -5,9 +5,6 @@ BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../datalake
 LANDING_PATH = os.path.join(BASE_PATH, 'landing')
 RAW_PATH = os.path.join(BASE_PATH, 'raw')
 
-# Criar a pasta raw se não existir
-os.makedirs(RAW_PATH, exist_ok=True)
-
 def processar_txt_para_parquet():
     arquivos_txt = [f for f in os.listdir(LANDING_PATH) if f.endswith('.txt')]
 

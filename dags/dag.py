@@ -7,14 +7,14 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../scripts')))
 
 from scripts.captura_dados import captura_quantidade_dados
-from scripts.processamento import mover_para_raw
+from scripts.processamento import processar_txt_para_parquet
 from scripts.limpeza_dados import limpar_e_validar_dados
 from scripts.gerar_relatorio import gerar_relatorio
 
 dag = DAG(
-    'atracacoes_e_cargas_2021',
-    start_date=datetime(2021, 12, 1),
-    schedule_interval='30 * * * *',
+    'atracacoes_e_cargas',
+    start_date=datetime(2025, 2, 15),
+    schedule_interval=None,
     catchup=False
 )
 
@@ -25,9 +25,9 @@ task_captura_quantidade_dados = PythonOperator(
     dag=dag
 )
 
-task_mover_para_raw = PythonOperator(
-    task_id='mover_para_raw',
-    python_callable=mover_para_raw,
+task_processar_txt_para_parquet = PythonOperator(
+    task_id='processar_txt_para_parquet',
+    python_callable=processar_txt_para_parquet,
     dag=dag
 )
 
@@ -43,4 +43,4 @@ task_gerar_relatorio = PythonOperator(
     dag=dag
 )
 
-task_captura_quantidade_dados >> task_mover_para_raw >> task_limpar_e_validar >> task_gerar_relatorio
+task_captura_quantidade_dados >> task_processar_txt_para_parquet >> task_limpar_e_validar >> task_gerar_relatorio
