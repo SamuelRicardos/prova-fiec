@@ -1,30 +1,40 @@
 import os
 import shutil
 
-# Caminho para a pasta 'data' na raiz do projeto
-BASE_PATH = os.path.abspath(os.path.dirname(__file__))  # Caminho para a raiz do projeto
-DATA_PATH = os.path.join(BASE_PATH, '../../data')  # Caminho para a pasta 'data'
-LANDING_PATH = os.path.join(BASE_PATH, 'datalake', 'landing')  # Caminho para a pasta 'landing' dentro de 'datalake'
 
-def captura_quantidade_dados():
-    # Verificando se a pasta 'data' existe e contém arquivos .txt
-    arquivos_txt = [f for f in os.listdir(DATA_PATH) if f.endswith('.txt')]
+BASE_PATH = os.path.abspath(os.path.dirname(__file__))
+RESERVA_PATH = os.path.join(BASE_PATH, '../../reserva')
+LANDING_PATH = os.path.join(BASE_PATH, '../datalake', 'landing')
+
+
+ARQUIVOS_PERMITIDOS = {
+    "2021Atracacao.txt", "2021Carga.txt",
+    "2022Atracacao.txt", "2022Carga.txt",
+    "2023Atracacao.txt", "2023Carga.txt"
+}
+
+def captura_dados():
+    
+    arquivos_txt = [f for f in os.listdir(RESERVA_PATH) if f in ARQUIVOS_PERMITIDOS]
 
     if not arquivos_txt:
-        print("Nenhum arquivo .txt encontrado na pasta 'data'.")
+        print("Nenhum arquivo permitido encontrado na pasta 'reserva'.")
         return 0
 
-    os.makedirs(LANDING_PATH, exist_ok=True)  # Garantir que a pasta landing existe
+    os.makedirs(LANDING_PATH, exist_ok=True)  
 
     for arquivo in arquivos_txt:
-        origem = os.path.join(DATA_PATH, arquivo)
+        origem = os.path.join(RESERVA_PATH, arquivo)
         destino = os.path.join(LANDING_PATH, arquivo)
 
         try:
-            # Movendo o arquivo .txt da pasta 'data' para a pasta 'landing'
+            
             shutil.move(origem, destino)
             print(f"Arquivo {arquivo} movido para a camada 'landing'.")
         except Exception as e:
             print(f"Erro ao mover {arquivo}: {e}")
 
     return len(arquivos_txt)
+
+if __name__ == "__main__":
+    captura_dados()
