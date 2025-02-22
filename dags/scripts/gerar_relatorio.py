@@ -28,29 +28,41 @@ def gerar_relatorio():
         'FlagConteinerTamanho', 'Mês da data de início da operação da atracação'
     ]
     
+    dfs_atracacao = []
+    dfs_carga = []
+
     for arquivo in os.listdir(trusted_dir):
         if arquivo.endswith('.parquet'):
             trusted_path = os.path.join(trusted_dir, arquivo)
-            business_path = os.path.join(business_dir, arquivo)
-            
+
             print(f'🔍 Processando {arquivo}...')
-            
+
             try:
                 df = pd.read_parquet(trusted_path, engine='pyarrow')
-                
+
                 if 'IDAtracacao' in df.columns and 'Tipo de Navegação da Atracação' in df.columns:
                     df = df[[col for col in atracacao_cols if col in df.columns]]
+                    dfs_atracacao.append(df)
                 elif 'IDCarga' in df.columns and 'FlagTransporteViaInterioir' in df.columns:
                     df = df[[col for col in carga_cols if col in df.columns]]
+                    dfs_carga.append(df)
                 else:
                     print(f'⚠️ Estrutura desconhecida em {arquivo}, ignorando.')
                     continue
-                
-                df.to_parquet(business_path, index=False, engine='pyarrow')
-                print(f'✅ {arquivo} salvo na camada business.')
 
                 os.remove(trusted_path)
                 print(f'🗑️ {arquivo} removido da pasta "trusted".')
 
             except Exception as e:
                 print(f'⚠️ Erro ao processar {arquivo}: {e}')
+
+    
+    if dfs_atracacao:
+        df_atracacao_final = pd.concat(dfs_atracacao, ignore_index=True)
+        df_atracacao_final.to_parquet(os.path.join(business_dir, 'atracacao.parquet'), index=False, engine='pyarrow')
+        print('✅ Arquivo consolidado "atracacao.parquet" salvo na camada business.')
+
+    if dfs_carga:
+        df_carga_final = pd.concat(dfs_carga, ignore_index=True)
+        df_carga_final.to_parquet(os.path.join(business_dir, 'carga.parquet'), index=False, engine='pyarrow')
+        print('✅ Arquivo consolidado "carga.parquet" salvo na camada business.')
