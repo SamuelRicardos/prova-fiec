@@ -68,8 +68,8 @@ x-airflow-common:
 
     #configuração do email - COLOCAR SEU EMAIL E A SENHA DE APP AQUI
     AIRFLOW__SMTP__SMTP_HOST: smtp.gmail.com
-    AIRFLOW__SMTP__SMTP_USER: 
-    AIRFLOW__SMTP__SMTP_PASSWORD:
+    AIRFLOW__SMTP__SMTP_USER: samuelric4rdo@gmail.com
+    AIRFLOW__SMTP__SMTP_PASSWORD: cmuy jpju wojp jtww
     AIRFLOW__SMTP__SMTP_PORT: 587
     AIRFLOW__SMTP__MAIL_FROM: Airflow
 
