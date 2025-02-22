@@ -25,7 +25,7 @@ def gerar_relatorio():
         'STSH2', 'Tipo Operação da Carga', 'STSH4', 'Carga Geral Acondicionamento', 'Natureza da Carga',
         'ConteinerEstado', 'Sentido', 'Tipo Navegação', 'TEU', 'FlagAutorizacao', 'QTCarga',
         'FlagCabotagem', 'VLPesoCargaBruta', 'FlagCabotagemMovimentacao', 'Ano da data de início da operação da atracação',
-        'FlagConteinerTamanho', 'Mês da data de início da operação da atracação', 'FlagLongoCurso', 'FlagMCOperacaoCarga', 'FlagOffshore'
+        'FlagConteinerTamanho', 'Mês da data de início da operação da atracação'
     ]
     
     for arquivo in os.listdir(trusted_dir):
@@ -33,7 +33,7 @@ def gerar_relatorio():
             trusted_path = os.path.join(trusted_dir, arquivo)
             business_path = os.path.join(business_dir, arquivo)
             
-            print(f'Processando {arquivo}...')
+            print(f'🔍 Processando {arquivo}...')
             
             try:
                 df = pd.read_parquet(trusted_path, engine='pyarrow')
@@ -43,14 +43,14 @@ def gerar_relatorio():
                 elif 'IDCarga' in df.columns and 'FlagTransporteViaInterioir' in df.columns:
                     df = df[[col for col in carga_cols if col in df.columns]]
                 else:
-                    print(f'Estrutura desconhecida em {arquivo}, ignorando.')
+                    print(f'⚠️ Estrutura desconhecida em {arquivo}, ignorando.')
                     continue
                 
                 df.to_parquet(business_path, index=False, engine='pyarrow')
-                print(f'{arquivo} salvo na camada business.')
+                print(f'✅ {arquivo} salvo na camada business.')
 
                 os.remove(trusted_path)
-                print(f'{arquivo} removido da pasta "trusted".')
+                print(f'🗑️ {arquivo} removido da pasta "trusted".')
 
             except Exception as e:
-                print(f'Erro ao processar {arquivo}: {e}')
+                print(f'⚠️ Erro ao processar {arquivo}: {e}')
